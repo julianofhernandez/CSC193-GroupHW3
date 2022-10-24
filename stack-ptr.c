@@ -17,7 +17,11 @@ executes 500 times.
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 
+int THREAD_COUNT = 2;
+// Mutx stuff, counter will be swapped with the stack
+pthread_mutex_t lock;
 
 // Linked list node
 typedef int value_t;
@@ -36,6 +40,8 @@ int     is_empty(           StackNode *top);
 void *testStack()
 {
     printf("Running testStack!\n");
+    pthread_mutex_lock(&lock);
+    pthread_mutex_unlock(&lock);
     pthread_exit(0);
 }
 
@@ -44,13 +50,7 @@ int main(void)
     printf("Starting Group HW3\n");
     StackNode *top = NULL;
 
-    push(5, &top);
-    push(10,&top);
-    pop (   &top);
-    push(15,&top);
-    pop (   &top);
-    pop (   &top);
-    push(20,&top);
+
 
     push(-5, &top);
     pop (    &top);
@@ -60,14 +60,15 @@ int main(void)
     push(-15,&top);
     pop (    &top);
     push(-20,&top);
-    pthread_t thread;
+
+    pthread_t thread[THREAD_COUNT];
     int error;
-    error = pthread_create(&thread, NULL, &testStack, NULL);
-    if (error)
-        printf("Failed to create thread\n");
-    else
-        printf("Thread created\n");
-    pthread_join(thread, NULL);
+    int i = 0;
+    while (i < THREAD_COUNT) {
+        thread[i] = pthread_create(&thread[i], NULL, &testStack, NULL);
+        i++;
+    }
+    pthread_join(thread[0], NULL);
     return 0;
 }
 
