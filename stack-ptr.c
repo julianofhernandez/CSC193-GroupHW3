@@ -1,14 +1,12 @@
-/*
-* Stack containing race conditions
+/** Stack containing race conditions
 This program currently has a race condition and is not appropriate for a concurrent environment. Using 
 Pthreads mutex locks (section 7.3.1), fix the race conditions. Test your now-thread-safe stack by creating 200 concurrent threads in main() that intermix pushing and popping values. 
-
 -	The testStack function should intermix 3 push operations with 3 pop operations in a loop that 
 executes 500 times. 
+-   All threads use the same stack. 
 
-
+Run using: gcc -pthread stack-ptr.c -o stack-ptr ; ./stack-ptr
 */
-// Run using: gcc -pthread stack-ptr.c -o stack-ptr ; ./stack-ptr
 
 #include <stdio.h>
 #include <stdlib.h>
