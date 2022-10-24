@@ -3,12 +3,8 @@
 This program currently has a race condition and is not appropriate for a concurrent environment. Using 
 Pthreads mutex locks (section 7.3.1), fix the race conditions. Test your now-thread-safe stack by creating 200 concurrent threads in main() that intermix pushing and popping values. 
 
--	Use a loop in main() to create all those threads. Apply all the things you've learned about creating 
-and joining threads 
--	Write one testStack function, and use it as the entry point for each thread. 
 -	The testStack function should intermix 3 push operations with 3 pop operations in a loop that 
 executes 500 times. 
--	All threads use the same stack. 
 
 
 */
@@ -19,7 +15,7 @@ executes 500 times.
 #include <pthread.h>
 #include <unistd.h>
 
-int THREAD_COUNT = 2;
+int THREAD_COUNT = 2; // Needs to be set to 500 before submitting
 // Mutx stuff, counter will be swapped with the stack
 pthread_mutex_t lock;
 
@@ -37,10 +33,11 @@ value_t pop     (           StackNode **top);
 int     is_empty(           StackNode *top);
 
 
-void *testStack()
+void *testStack() //Stack pointer needs to be passed here, use push and pop function as a sample
 {
     printf("Running testStack!\n");
     pthread_mutex_lock(&lock);
+    // Do 3 pushes and 3 pops
     pthread_mutex_unlock(&lock);
     pthread_exit(0);
 }
@@ -49,8 +46,6 @@ int main(void)
 {
     printf("Starting Group HW3\n");
     StackNode *top = NULL;
-
-
 
     push(-5, &top);
     pop (    &top);
@@ -68,7 +63,11 @@ int main(void)
         thread[i] = pthread_create(&thread[i], NULL, &testStack, NULL);
         i++;
     }
-    pthread_join(thread[0], NULL);
+    i = 0;
+    while (i < THREAD_COUNT) {
+        pthread_join(thread[i], NULL);
+        i++;
+    }
     return 0;
 }
 
