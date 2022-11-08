@@ -13,7 +13,7 @@ Run using: gcc -pthread stack-ptr.c -o stack-ptr ; ./stack-ptr
 #include <pthread.h>
 #include <unistd.h>
 
-int THREAD_COUNT = 2; // Needs to be set to 500 before submitting
+int THREAD_COUNT = 500; // Needs to be set to 500 before submitting
 // Mutx stuff, counter will be swapped with the stack
 pthread_mutex_t lock;
 
@@ -31,11 +31,19 @@ value_t pop     (           StackNode **top);
 int     is_empty(           StackNode *top);
 
 
-void *testStack() //Stack pointer needs to be passed here, use push and pop function as a sample
+void *testStack(void *arg) //Stack pointer needs to be passed here, use push and pop function as a sample
 {
-    printf("Running testStack!\n");
     pthread_mutex_lock(&lock);
+	printf("Running testStack!\n");
     // Do 3 pushes and 3 pops
+    StackNode *top = NULL;
+
+    push(5, &top);
+    push(10, &top);
+    push(15, &top);
+    pop(    &top);
+    pop(    &top);
+    pop(    &top);
     pthread_mutex_unlock(&lock);
     pthread_exit(0);
 }
@@ -44,6 +52,10 @@ int main(void)
 {
     printf("Starting Group HW3\n");
     StackNode *top = NULL;
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
 
     push(-5, &top);
     pop (    &top);
@@ -57,15 +69,20 @@ int main(void)
     pthread_t thread[THREAD_COUNT];
     int error;
     int i = 0;
+	printf("Launching %d threads\n", THREAD_COUNT);
     while (i < THREAD_COUNT) {
-        thread[i] = pthread_create(&thread[i], NULL, &testStack, NULL);
+		printf("launching thread[%d]\n", i);
+        thread[i] = pthread_create(&(thread[i]), NULL, &testStack, NULL);
         i++;
     }
-    i = 0;
+	printf("%d threads launched\n", i);
+	i = 0;
     while (i < THREAD_COUNT) {
+		printf("Joining thread[%d]\n", i);
         pthread_join(thread[i], NULL);
         i++;
     }
+	pthread_mutex_destroy(&lock);
     return 0;
 }
 
