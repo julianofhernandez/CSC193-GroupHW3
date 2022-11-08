@@ -30,7 +30,7 @@ void    push    (value_t v, StackNode **top);
 value_t pop     (           StackNode **top);
 int     is_empty(           StackNode *top);
 
-
+// Function used by threads
 void *testStack(void *arg) //Stack pointer needs to be passed here, use push and pop function as a sample
 {
     pthread_mutex_lock(&lock);
@@ -52,6 +52,7 @@ int main(void)
 {
     printf("Starting Group HW3\n");
     StackNode *top = NULL;
+	// Init lock
     if (pthread_mutex_init(&lock, NULL) != 0) {
         printf("\n mutex init has failed\n");
         return 1;
@@ -60,7 +61,6 @@ int main(void)
     push(-5, &top);
     pop (    &top);
     push(-10,&top);
-    pop (    &top);
     pop (    &top);
     push(-15,&top);
     pop (    &top);
@@ -82,6 +82,7 @@ int main(void)
         pthread_join(thread[i], NULL);
         i++;
     }
+	// Clean up
 	pthread_mutex_destroy(&lock);
     return 0;
 }
